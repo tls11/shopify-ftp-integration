@@ -59,8 +59,7 @@ async function updateShopifyWithInventory(inventoryFilePath, layout) {
         .pipe(csv({ separator: ';' })) 
         .on('data', async (row) => {
             const productData = mapRowToProductData(row, layout);
-            // Implement your logic to update or create Shopify products here
-            // For example: await updateOrCreateShopifyProduct(productData);
+            
         })
         .on('end', () => {
             console.log('Inventory update process completed.');
@@ -68,7 +67,7 @@ async function updateShopifyWithInventory(inventoryFilePath, layout) {
 }
 
 function mapRowToProductData(row, layout) {
-    // This mapping needs to be adjusted based on your actual data and Shopify requirements
+    
     return {
         title: row[layout['Product Title']],
         body_html: row[layout['Description']],
@@ -77,7 +76,6 @@ function mapRowToProductData(row, layout) {
             sku: row[layout['SKU']],
             inventory_quantity: parseInt(row[layout['Quantity']], 10)
         }],
-        // Add more fields as needed
     };
 }
 
