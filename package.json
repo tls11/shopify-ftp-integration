@@ -11,7 +11,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@shopify/shopify-api": "^9.0.2",
+    "@shopify/admin-api-client": "^0.2.2",
     "basic-ftp": "^5.0.4",
     "csv-parser": "^3.0.0",
     "dotenv": "^16.4.1",

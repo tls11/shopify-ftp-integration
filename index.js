@@ -3,12 +3,19 @@ import { Client } from 'basic-ftp';
 import fs from 'fs';
 import pkg from 'papaparse';
 const { parse } = pkg;
-
+import {createAdminApiClient} from '@shopify/admin-api-client';
 config();
 
 const FTP_HOST = process.env.FTP_HOST;
 const FTP_USER = process.env.FTP_USER;
 const FTP_PASSWORD = process.env.FTP_PASSWORD;
+
+const adminClient = createAdminApiClient({
+    storeDomain: process.env.SHOPIFY_DOMAIN,
+    apiVersion: '2023-04',
+    accessToken: process.env.SHOPIFY_ACCESS_TOKEN,
+});
+  
 
 const HEADERS = [
     "RSR Stock Number",
