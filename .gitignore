@@ -15,4 +15,7 @@ yarn-error.log*
 
 # local env files
 .env*
+fulfillment-inv-new.txt
+rsr_inventory_file_layout-new.txt
+products.jsonl
 
