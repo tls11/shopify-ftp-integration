@@ -1,0 +1,212 @@
+[
+  {
+    "handle": "handguns",
+    "title": "Handguns",
+    "gid": "gid://shopify/Collection/308086898879"
+  },
+  {
+    "handle": "used-handguns",
+    "title": "Used Handguns",
+    "gid": "gid://shopify/Collection/308086931647"
+  },
+  {
+    "handle": "used-long-guns",
+    "title": "Used Long Guns",
+    "gid": "gid://shopify/Collection/308086964415"
+  },
+  {
+    "handle": "tasers",
+    "title": "Tasers",
+    "gid": "gid://shopify/Collection/308086997183"
+  },
+  {
+    "handle": "long-guns",
+    "title": "Long Guns",
+    "gid": "gid://shopify/Collection/308087029951"
+  },
+  {
+    "handle": "nfa-products",
+    "title": "NFA Products",
+    "gid": "gid://shopify/Collection/308087062719"
+  },
+  {
+    "handle": "black-powder",
+    "title": "Black Powder",
+    "gid": "gid://shopify/Collection/308087095487"
+  },
+  {
+    "handle": "optics",
+    "title": "Optics",
+    "gid": "gid://shopify/Collection/308087128255"
+  },
+  {
+    "handle": "optical-accessories",
+    "title": "Optical Accessories",
+    "gid": "gid://shopify/Collection/308087161023"
+  },
+  {
+    "handle": "magazines",
+    "title": "Magazines",
+    "gid": "gid://shopify/Collection/308087193791"
+  },
+  {
+    "handle": "grips-pads-stocks-bipods",
+    "title": "Grips, Pads, Stocks, Bipods",
+    "gid": "gid://shopify/Collection/308087226559"
+  },
+  {
+    "handle": "soft-gun-cases-packs-bags",
+    "title": "Soft Gun Cases, Packs, Bags",
+    "gid": "gid://shopify/Collection/308087259327"
+  },
+  {
+    "handle": "misc-accessories",
+    "title": "Misc. Accessories",
+    "gid": "gid://shopify/Collection/308087292095"
+  },
+  {
+    "handle": "holsters-pouches",
+    "title": "Holsters & Pouches",
+    "gid": "gid://shopify/Collection/308087324863"
+  },
+  {
+    "handle": "reloading-equipment",
+    "title": "Reloading Equipment",
+    "gid": "gid://shopify/Collection/308087357631"
+  },
+  {
+    "handle": "black-powder-accessories",
+    "title": "Black Powder Accessories",
+    "gid": "gid://shopify/Collection/308087390399"
+  },
+  {
+    "handle": "closeout-accessories",
+    "title": "Closeout Accessories",
+    "gid": "gid://shopify/Collection/308087423167"
+  },
+  {
+    "handle": "ammunition",
+    "title": "Ammunition",
+    "gid": "gid://shopify/Collection/308087455935"
+  },
+  {
+    "handle": "survival-camping-supplies",
+    "title": "Survival & Camping Supplies",
+    "gid": "gid://shopify/Collection/308087488703"
+  },
+  {
+    "handle": "lights-lasers-batteries",
+    "title": "Lights, Lasers & Batteries",
+    "gid": "gid://shopify/Collection/308087521471"
+  },
+  {
+    "handle": "cleaning-equipment",
+    "title": "Cleaning Equipment",
+    "gid": "gid://shopify/Collection/308087554239"
+  },
+  {
+    "handle": "airguns",
+    "title": "Airguns",
+    "gid": "gid://shopify/Collection/308087587007"
+  },
+  {
+    "handle": "knives-tools",
+    "title": "Knives & Tools",
+    "gid": "gid://shopify/Collection/308087619775"
+  },
+  {
+    "handle": "high-capacity-magazines",
+    "title": "High Capacity Magazines",
+    "gid": "gid://shopify/Collection/308087652543"
+  },
+  {
+    "handle": "safes-security",
+    "title": "Safes & Security",
+    "gid": "gid://shopify/Collection/308087685311"
+  },
+  {
+    "handle": "safety-protection",
+    "title": "Safety & Protection",
+    "gid": "gid://shopify/Collection/308087718079"
+  },
+  {
+    "handle": "non-lethal-defense",
+    "title": "Non-Lethal Defense",
+    "gid": "gid://shopify/Collection/308087750847"
+  },
+  {
+    "handle": "binoculars",
+    "title": "Binoculars",
+    "gid": "gid://shopify/Collection/308087783615"
+  },
+  {
+    "handle": "spotting-scopes",
+    "title": "Spotting Scopes",
+    "gid": "gid://shopify/Collection/308087816383"
+  },
+  {
+    "handle": "sights",
+    "title": "Sights",
+    "gid": "gid://shopify/Collection/308087849151"
+  },
+  {
+    "handle": "barrels-choke-tubes",
+    "title": "Barrels & Choke Tubes",
+    "gid": "gid://shopify/Collection/308087881919"
+  },
+  {
+    "handle": "clothing",
+    "title": "Clothing",
+    "gid": "gid://shopify/Collection/308087914687"
+  },
+  {
+    "handle": "parts",
+    "title": "Parts",
+    "gid": "gid://shopify/Collection/308087947455"
+  },
+  {
+    "handle": "slings-swivels",
+    "title": "Slings & Swivels",
+    "gid": "gid://shopify/Collection/308087980223"
+  },
+  {
+    "handle": "electronics",
+    "title": "Electronics",
+    "gid": "gid://shopify/Collection/308088012991"
+  },
+  {
+    "handle": "unused",
+    "title": "Unused",
+    "gid": "gid://shopify/Collection/308088045759"
+  },
+  {
+    "handle": "books-software-dvds",
+    "title": "Books, Software & DVD's",
+    "gid": "gid://shopify/Collection/308088078527"
+  },
+  {
+    "handle": "targets",
+    "title": "Targets",
+    "gid": "gid://shopify/Collection/308088111295"
+  },
+  {
+    "handle": "hard-gun-cases",
+    "title": "Hard Gun Cases",
+    "gid": "gid://shopify/Collection/308088144063"
+  },
+  {
+    "handle": "upper-receivers-conversion-kits",
+    "title": "Upper Receivers & Conversion Kits",
+    "gid": "gid://shopify/Collection/308088176831"
+  },
+  {
+    "handle": "sbr-barrels-upper-receivers",
+    "title": "SBR Barrels & Upper Receivers",
+    "gid": "gid://shopify/Collection/308088209599"
+  },
+  {
+    "handle": "upper-receivers-conversion-kits-high-capacity",
+    "title": "Upper Receivers & Conversion Kits - High Capacity",
+    "gid": "gid://shopify/Collection/308088242367"
+  }
+]
