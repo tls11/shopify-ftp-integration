@@ -6,9 +6,11 @@ import FormData from 'form-data';
 import pkg from 'papaparse';
 import { shopifyApi, LATEST_API_VERSION } from '@shopify/shopify-api';
 import '@shopify/shopify-api/adapters/node'; // Make sure to import the adapter
+import { Stream } from 'stream';
+import { promisify } from 'util';
 const { parse } = pkg;
+const pipeline = promisify(Stream.pipeline);
 
-// Load your environment variables
 config();
 
 const SHOPIFY_API_KEY = process.env.SHOPIFY_API_KEY;
@@ -24,15 +26,21 @@ const shopify = shopifyApi({
     apiSecretKey: SHOPIFY_API_SECRET_KEY,
     scopes: SHOPIFY_API_SCOPES,
     hostName: SHOPIFY_DOMAIN,
-    apiVersion: LATEST_API_VERSION, // or specify your version directly, e.g., '2022-01'
+    apiVersion: LATEST_API_VERSION,
 });
 
 const FTP_HOST = process.env.FTP_HOST;
 const FTP_USER = process.env.FTP_USER;
 const FTP_PASSWORD = process.env.FTP_PASSWORD;
-  
 
-const HEADERS = [
+const graphqlEndpoint = `https://${SHOPIFY_DOMAIN}/admin/api/${LATEST_API_VERSION}/graphql.json`;
+const headers = {
+    'X-Shopify-Access-Token': SHOPIFY_ACCESS_TOKEN,
+    'Content-Type': 'application/json',
+};
+
+
+const COL_HEADERS = [
     "RSR Stock Number",
     "UPC Code",
     "Product Description",
@@ -194,57 +202,123 @@ function mapDepartmentToCollection(departmentNumber, departmentMappings) {
     return collectionMappings[departmentName];
 }
 
+// Assuming readShopifyInventory now returns more detailed info, including inventory quantities
+async function readShopifyInventoryDetailed() {
+    const shopifyInventoryPath = './shopify_inventory.jsonl';
+    const inventoryDetails = new Map(); // Map SKU to detailed inventory info
+
+    if (fs.existsSync(shopifyInventoryPath)) {
+        const inventoryData = fs.readFileSync(shopifyInventoryPath, 'utf8').split('\n');
+        for (let line of inventoryData) {
+            if (line) {
+                const data = JSON.parse(line);
+                if (data.sku && data.inventoryQuantity !== undefined) {
+                    inventoryDetails.set(data.sku, {
+                        quantity: data.inventoryQuantity,
+                        productId: data.__parentId,
+                        inventoryItemId: data.inventoryItem.id
+                    });
+                }
+            }
+        }
+    }
+    return inventoryDetails;
+}
+
 async function transformAndCreateJSONL(localInventoryPath) {
     const fileContent = fs.readFileSync(localInventoryPath, 'utf8');
     const lines = fileContent.split('\n').map(line => line.split(';'));
-    const products = lines.slice(1, 50).map(cols => {
+    const products = lines.slice(1).map(cols => {
         let product = {};
         cols.forEach((col, index) => {
-            product[HEADERS[index]] = col;
+            product[COL_HEADERS[index]] = col;
         });
         return product;
     });
 
-    const jsonlProducts = products.map(product => {
-        const collectionGID = mapDepartmentToCollection(product['Department Number']);
-        return {
-            input: {
-                title: product['Product Description'],
-                descriptionHtml: product['Expanded Product Description'],
-                vendor: product['Full Manufacturer Name'],
-                status: "ACTIVE",
-                published: true,
-                variants: [{
-                    sku: product['RSR Stock Number'],
-                    price: product['Retail Price'],
-                    inventoryQuantities: [{
-                        availableQuantity: parseInt(product['Inventory Quantity'], 10) || 0,
-                        locationId: SHOPIFY_LOCATION_ID
-                    }],
-                    weight: parseFloat(product['Product Weight']) || 0,
-                    weightUnit: "OUNCES"
-                }],
-                collectionsToJoin: [collectionGID], // Assign the GID directly here
-            },
-            media: [{
-                originalSource: `https://img.rsrgroup.com/pimages/${product['RSR Stock Number']}_1.jpg`,
-                alt: `${product['Product Description']} product image`,
-                mediaContentType: "IMAGE"
-            }],
-        };
-    });
+    const existingInventoryDetails = await readShopifyInventoryDetailed(); // Detailed inventory info including quantities
+    const newProducts = [];
+    const updatedProducts = [];
 
-    const jsonlContent = jsonlProducts.map(p => JSON.stringify(p)).join('\n');
-    fs.writeFileSync('./products.jsonl', jsonlContent);
-    console.log('JSONL file for Shopify created successfully.');
+    for (let product of products) {
+        const sku = product['RSR Stock Number'];
+        const newQuantity = parseInt(product['Inventory Quantity'], 10) || 0;
+
+        if (!existingInventoryDetails.has(sku)) {
+            // Handle new product
+            const productData = prepareNewProductData(product);
+            newProducts.push(productData);
+        } else {
+            // Existing product, check if inventory update is needed
+            const details = existingInventoryDetails.get(sku);
+            if (details.quantity !== newQuantity) {
+                // Prepare update data for existing product
+                const updatedProductData = {
+                    productId: details.productId, // Assuming you have the productId
+                    input: {
+                        id: details.productId,
+                        variants: [{
+                            id: details.inventoryItemId,
+                            inventoryQuantities: [{
+                                availableQuantity: newQuantity,
+                                locationId: SHOPIFY_LOCATION_ID
+                            }]
+                        }]
+                    }
+                };
+                updatedProducts.push(updatedProductData);
+            }
+        }
+    }
+
+    if (newProducts.length > 0) {
+        const newProductsJsonlContent = newProducts.map(p => JSON.stringify(p)).join('\n');
+        fs.writeFileSync('./new_products.jsonl', newProductsJsonlContent);
+        console.log(`${newProducts.length} new products filtered for creation.`);
+    }
+
+    if (updatedProducts.length > 0) {
+        const updatedProductsJsonlContent = updatedProducts.map(p => JSON.stringify(p)).join('\n');
+        fs.writeFileSync('./updated_products.jsonl', updatedProductsJsonlContent);
+        console.log(`${updatedProducts.length} products filtered for inventory update.`);
+    }
+}
+
+// This function should be adapted to match your product structure for Shopify
+function prepareNewProductData(product) {
+    const collectionGID = mapDepartmentToCollection(product['Department Number']);
+    return {
+        input: {
+            title: product['Product Description'],
+            descriptionHtml: product['Expanded Product Description'],
+            vendor: product['Full Manufacturer Name'],
+            status: "ACTIVE",
+            published: true,
+            variants: [{
+                sku: product['RSR Stock Number'],
+                price: product['Retail Price'],
+                inventoryItem: {
+                    cost: 0, // Update as needed
+                    tracked: true,
+                },
+                inventoryQuantities: [{
+                    availableQuantity: parseInt(product['Inventory Quantity'], 10) || 0,
+                    locationId: SHOPIFY_LOCATION_ID
+                }],
+                weight: parseFloat(product['Product Weight']) || 0,
+                weightUnit: "OUNCES"
+            }],
+            collectionsToJoin: [collectionGID],
+        },
+        media: [{
+            originalSource: `https://img.rsrgroup.com/pimages/${product['RSR Stock Number']}_1.jpg`,
+            alt: `${product['Product Description']} product image`,
+            mediaContentType: "IMAGE"
+        }],
+    };
 }
 
 async function uploadJSONLtoShopify(jsonlFilePath) {
-    const graphqlEndpoint = `https://${SHOPIFY_DOMAIN}/admin/api/${LATEST_API_VERSION}/graphql.json`;
-    const headers = {
-        'X-Shopify-Access-Token': SHOPIFY_ACCESS_TOKEN,
-        'Content-Type': 'application/json',
-    };
 
     // Prepare the mutation for creating staged upload
     const mutation = `
@@ -350,8 +424,56 @@ async function uploadJSONLtoShopify(jsonlFilePath) {
     }
 }
 
-// Polling function
-async function pollBulkOperationStatus(operationId, graphqlEndpoint, headers) {
+async function initiateProductFetchBulkOperation() {
+    const query = `
+        {
+            products {
+                edges {
+                    node {
+                        id
+                        variants(first: 250) {
+                            edges {
+                                node {
+                                    sku
+                                    inventoryQuantity
+                                    inventoryItem {
+                                        id
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }`;
+
+    const bulkOperationQuery = `
+        mutation {
+            bulkOperationRunQuery(
+                query: """${query}"""
+            ) {
+                bulkOperation {
+                    id
+                    status
+                }
+                userErrors {
+                    field
+                    message
+                }
+            }
+        }`;
+
+    try {
+        const response = await axios.post(graphqlEndpoint, JSON.stringify({ query: bulkOperationQuery }), { headers });
+        const bulkOperation = response.data.data.bulkOperationRunQuery.bulkOperation;
+        console.log(`Bulk operation initiated with ID: ${bulkOperation.id}, status: ${bulkOperation.status}`);
+        return bulkOperation.id;
+    } catch (error) {
+        console.error('Failed to initiate bulk fetch operation:', error.message);
+    }
+}
+
+async function pollBulkOperationStatus(operationId, graphqlEndpoint, headers, shouldDownload = false) {
     let operationInProgress = true;
     console.log(`Polling status of operation: ${operationId}`);
 
@@ -382,9 +504,23 @@ async function pollBulkOperationStatus(operationId, graphqlEndpoint, headers) {
         if (operationStatus === 'COMPLETED' || operationStatus === 'FAILED') {
             operationInProgress = false;
             console.log(`Operation finished with status: ${operationStatus}`);
+
+            // Log the URL regardless of shouldDownload
             if (operationStatus === 'COMPLETED') {
                 console.log(`Results available at: ${data.data.node.url}`);
-            } else if (data.data.node.partialDataUrl) {
+                if (shouldDownload && data.data.node.url) {
+                    console.log(`Downloading results from: ${data.data.node.url}`);
+                    await downloadResults(data.data.node.url, './shopify_inventory.jsonl');
+                    console.log(`Results saved to shopify_inventory.jsonl`);
+                }
+                else if (shouldDownload && data.data.node.partialDataUrl === null) {
+                    // create empty shopify_inventory.jsonl
+                    fs.writeFileSync('./shopify_inventory.jsonl', '');
+                    console.log('No results available to download');
+                }
+            }
+
+            if (data.data.node.partialDataUrl) {
                 console.log(`Partial results available at: ${data.data.node.partialDataUrl}`);
             }
         } else {
@@ -395,11 +531,28 @@ async function pollBulkOperationStatus(operationId, graphqlEndpoint, headers) {
     }
 }
 
+async function downloadResults(url, outputPath) {
+    try {
+        const response = await axios({
+            url,
+            method: 'GET',
+            responseType: 'stream',
+        });
+        await pipeline(response.data, fs.createWriteStream(outputPath));
+    } catch (error) {
+        console.error(`Failed to download file: ${error.message}`);
+    }
+}
+
 async function main() {
+
+    const bulkOperationId = await initiateProductFetchBulkOperation();
+    await pollBulkOperationStatus(bulkOperationId, graphqlEndpoint, headers, true);
     const localInventoryPath = './fulfillment-inv-new.txt';
     await downloadFile('/ftpdownloads/fulfillment-inv-new.txt', localInventoryPath);
-    transformAndCreateJSONL(localInventoryPath); // Ensure this function creates 'products.jsonl'
-    // await uploadJSONLtoShopify('./products.jsonl').catch(console.error);
+    transformAndCreateJSONL(localInventoryPath);
+    await uploadJSONLtoShopify('./new_products.jsonl').catch(console.error);
+    await uploadJSONLtoShopify('./updated_products.jsonl').catch(console.error);
 }
 
 main().catch(console.error);

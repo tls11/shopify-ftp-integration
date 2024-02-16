@@ -18,4 +18,7 @@ yarn-error.log*
 fulfillment-inv-new.txt
 rsr_inventory_file_layout-new.txt
 products.jsonl
+new_products.jsonl
+updated_products.jsonl
+shopify_inventory.jsonl
 

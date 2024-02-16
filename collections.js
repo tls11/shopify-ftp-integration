@@ -50,6 +50,51 @@ async function fetchCollectionByHandle(handle) {
     }
 }
 
+async function createCollection(title, handle) {
+    const mutation = `
+        mutation collectionCreate($input: CollectionInput!) {
+            collectionCreate(input: $input) {
+                collection {
+                    id
+                    title
+                    handle
+                }
+                userErrors {
+                    field
+                    message
+                }
+            }
+        }
+    `;
+
+    const variables = {
+        input: {
+            title: title,
+            handle: handle,
+        },
+    };
+
+    try {
+        const { data } = await axios.post(
+            graphqlEndpoint,
+            { query: mutation, variables: variables },
+            { headers: headers }
+        );
+
+        if (data.data.collectionCreate && data.data.collectionCreate.collection) {
+            console.log(`Collection "${title}" created successfully.`);
+            return data.data.collectionCreate.collection;
+        } else if (data.data.collectionCreate.userErrors.length > 0) {
+            console.error('Failed to create collection:', data.data.collectionCreate.userErrors);
+            return null;
+        }
+    } catch (error) {
+        console.error(`Failed to create collection "${title}":`, error);
+        return null;
+    }
+}
+
+
 async function createOrFetchCollections() {
     const collections = [
         { title: "Handguns", handle: "handguns" },
@@ -100,8 +145,9 @@ async function createOrFetchCollections() {
     for (let { title, handle } of collections) {
         let collection = await fetchCollectionByHandle(handle);
         if (!collection) {
-            console.log(`Collection with handle "${handle}" does not exist. Skipping.`);
-            continue;
+            console.log(`Collection with handle "${handle}" does not exist. Creating.`);
+            collection = await createCollection(title, handle);
+            if (!collection) continue; // If collection creation failed, skip this iteration
         }
         collectionsData.push({
             handle: collection.handle,
