@@ -2,7 +2,7 @@ name: Run Shopify Script
 
 on:
   schedule:
-    - cron:  '0 12 * * *' # Runs at 7 AM EST (12 PM UTC)
+    - cron:  '0 11,13,15,17,19,21 * * *' # Run every 2 hrs during the work day, EST
   workflow_dispatch:
 
 jobs:
