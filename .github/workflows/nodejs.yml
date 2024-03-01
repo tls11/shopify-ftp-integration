@@ -2,20 +2,19 @@ name: Run Shopify Script
 
 on:
   schedule:
-    # Runs at 7am, 9am, 11am, 1pm, 3pm, and 5pm EST
-    # You need to convert these times to UTC
-    - cron:  '0 11,13,15,17,19,21 * * *'
+    # Runs once a day at 7 AM EST (12 PM UTC)
+    - cron:  '0 12 * * *'
 
 jobs:
   run-script:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3 # Updated to the latest major version
 
     - name: Set up Node.js
-      uses: actions/setup-node@v2
+      uses: actions/setup-node@v3 # Updated to the latest major version
       with:
-        node-version: '21' # Specify your Node.js version
+        node-version: '20' # Updated to Node.js 20
 
     - name: Install dependencies
       run: npm install
@@ -31,5 +30,4 @@ jobs:
         FTP_HOST: ${{secrets.FTP_HOST }}
         FTP_USER: ${{secrets.FTP_USER }}
         FTP_PASSWORD: ${{secrets.FTP_PASSWORD }}
-      run: node index.js # Replace with the path to your script
-
+      run: node index.js # Ensure this path matches your script location
