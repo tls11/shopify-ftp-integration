@@ -2,17 +2,17 @@ name: Run Shopify Script
 
 on:
   schedule:
-    # Runs once a day at 7 AM EST (12 PM UTC)
-    - cron:  '0 12 * * *'
+    - cron:  '0 12 * * *' # Runs at 7 AM EST (12 PM UTC)
+  workflow_dispatch:
 
 jobs:
   run-script:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3 # Updated to the latest major version
+    - uses: actions/checkout@v3 # Updated to v3
 
     - name: Set up Node.js
-      uses: actions/setup-node@v3 # Updated to the latest major version
+      uses: actions/setup-node@v3 # Updated to v3
       with:
         node-version: '20' # Updated to Node.js 20
 
@@ -21,13 +21,13 @@ jobs:
 
     - name: Run the script
       env:
-        SHOPIFY_DOMAIN: ${{secrets.SHOPIFY_DOMAIN }}
-        SHOPIFY_API_KEY: ${{secrets.SHOPIFY_API_KEY }}
-        SHOPIFY_API_SECRET_KEY: ${{secrets.SHOPIFY_API_SECRET_KEY }}
-        SHOPIFY_ACCESS_TOKEN: ${{secrets.SHOPIFY_ACCESS_TOKEN }}
-        SHOPIFY_API_SCOPES: ${{secrets.SHOPIFY_API_SCOPES }}
-        SHOPIFY_LOCATION_ID: ${{secrets.SHOPIFY_LOCATION_ID }}
-        FTP_HOST: ${{secrets.FTP_HOST }}
-        FTP_USER: ${{secrets.FTP_USER }}
-        FTP_PASSWORD: ${{secrets.FTP_PASSWORD }}
-      run: node index.js # Ensure this path matches your script location
+        SHOPIFY_DOMAIN: ${{secrets.SHOPIFY_DOMAIN}}
+        SHOPIFY_API_KEY: ${{secrets.SHOPIFY_API_KEY}}
+        SHOPIFY_API_SECRET_KEY: ${{secrets.SHOPIFY_API_SECRET_KEY}}
+        SHOPIFY_ACCESS_TOKEN: ${{secrets.SHOPIFY_ACCESS_TOKEN}}
+        SHOPIFY_API_SCOPES: ${{secrets.SHOPIFY_API_SCOPES}}
+        SHOPIFY_LOCATION_ID: ${{secrets.SHOPIFY_LOCATION_ID}}
+        FTP_HOST: ${{secrets.FTP_HOST}}
+        FTP_USER: ${{secrets.FTP_USER}}
+        FTP_PASSWORD: ${{secrets.FTP_PASSWORD}}
+      run: node index.js # Replace with the path to your script
