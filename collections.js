@@ -1,16 +1,15 @@
 // collections.js
-import { config } from 'dotenv';
+import 'dotenv/config'
 import axios from 'axios';
 import { shopifyApi, LATEST_API_VERSION } from '@shopify/shopify-api';
 import '@shopify/shopify-api/adapters/node';
 import fs from 'fs';
-config();
 
 const SHOPIFY_API_KEY = process.env.SHOPIFY_API_KEY;
 const SHOPIFY_API_SECRET_KEY = process.env.SHOPIFY_API_SECRET_KEY;
 const SHOPIFY_ACCESS_TOKEN = process.env.SHOPIFY_ACCESS_TOKEN;
-const SHOPIFY_DOMAIN = process.env.SHOPIFY_DOMAIN;
-const graphqlEndpoint = `https://${SHOPIFY_DOMAIN}/admin/api/${LATEST_API_VERSION}/graphql.json`;
+const SHOPIFY_STORE_NAME = process.env.SHOPIFY_STORE_NAME;
+const graphqlEndpoint = `https://${SHOPIFY_STORE_NAME}.myshopify.com/admin/api/2024-04/graphql.json`;
 
 const headers = {
     'X-Shopify-Access-Token': SHOPIFY_ACCESS_TOKEN,
@@ -37,7 +36,6 @@ async function fetchCollectionByHandle(handle) {
             },
             { headers: headers }
         );
-
         if (data.data.collectionByHandle) {
             return data.data.collectionByHandle;
         } else {
@@ -80,11 +78,10 @@ async function createCollection(title, handle) {
             { query: mutation, variables: variables },
             { headers: headers }
         );
-
         if (data.data.collectionCreate && data.data.collectionCreate.collection) {
             console.log(`Collection "${title}" created successfully.`);
             return data.data.collectionCreate.collection;
-        } else if (data.data.collectionCreate.userErrors.length > 0) {
+        } else if (data.data.collectionCreate.userErrors.length) {
             console.error('Failed to create collection:', data.data.collectionCreate.userErrors);
             return null;
         }
@@ -94,8 +91,7 @@ async function createCollection(title, handle) {
     }
 }
 
-
-async function createOrFetchCollections() {
+export async function createOrFetchCollections() {
     const collections = [
         { title: "Handguns", handle: "handguns" },
         { title: "Used Handguns", handle: "used-handguns" },
@@ -138,7 +134,7 @@ async function createOrFetchCollections() {
         { title: "Hard Gun Cases", handle: "hard-gun-cases" },
         { title: "Upper Receivers & Conversion Kits", handle: "upper-receivers-conversion-kits" },
         { title: "SBR Barrels & Upper Receivers", handle: "sbr-barrels-upper-receivers" },
-        { title: "Upper Receivers & Conversion Kits - High Capacity", handle: "upper-receivers-conversion-kits-high-capacity" }
+        { title: "Upper Receivers & Conversion Kits - High Capacity", handle: "upper-receivers-conversion-kits-high-capacity" },
     ];
     const collectionsData = [];
 
