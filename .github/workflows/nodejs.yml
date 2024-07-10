@@ -2,7 +2,7 @@ name: Run Shopify Script
 
 on:
   schedule:
-    - cron:  '0 11,13,15,17,19,21 * * *' # Run every 2 hrs during the work day, EST
+    - cron:  '10 12,14,16,18,20,22,0 * * *' # Run every 2 hrs during the work day, EST
   workflow_dispatch:
 
 jobs:
@@ -34,4 +34,4 @@ jobs:
         FTP_HOST: ${{ secrets.FTP_HOST }}
         FTP_USER: ${{ secrets.FTP_USER }}
         FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
-      run: node index.js
+      run: node app.js
