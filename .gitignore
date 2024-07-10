@@ -15,10 +15,7 @@ yarn-error.log*
 
 # local env files
 .env*
-fulfillment-inv-new.txt
-rsr_inventory_file_layout-new.txt
-products.jsonl
-new_products.jsonl
-updated_products.jsonl
-shopify_inventory.jsonl
-
+rsr-inventory.txt
+shopify-inventory.jsonl
+productset-inputs.jsonl
+productset-res-info.jsonl
